@@ -4,6 +4,7 @@ var fs = require('fs');
 //This line effectively means we've placed the "brain" object that brain.js gives us into the usable scope for this file. We have not yet done anything with that object- that's your task!
 var brain = require('brain');
 
+var net = new brain.NeuralNetwork();
 //TODO: your code here to create a new neural net instance
 
 module.exports = {
@@ -38,6 +39,20 @@ module.exports = {
 
     //TODO: Your code here to train the neural net
 
+    //console.log(testingData);
+
+    net.train(trainingData,
+               {
+                 errorThresh: 0.005,  // error threshold to reach
+                 iterations: 30,   // maximum training iterations
+                 log: true,           // console.log() progress periodically
+                 logPeriod: 10,       // number of iterations between logging
+                 learningRate: 0.3    // learning rate
+               });
+
+    var output = net.run([1, 0]);  // [0.987]
+
+    console.log(output);
 
     console.timeEnd('trainBrain');
 
@@ -46,7 +61,7 @@ module.exports = {
     console.log(jsonBackup);
     var runBackup = net.toFunction();
     module.exports.writeBrain(jsonBackup);
-
+    //console.log("Made it past backup");
     // now test the results and see how our machine did!
     module.exports.testBrain(testingData);
   },
@@ -74,7 +89,9 @@ module.exports = {
         nnPredictions: { defaulted: 0.34634397489904356 } }
       */
 
-    
+    testData.forEach(function(v, i, array){
+      testData[i].nnPredictions = net.run(v.input);
+    });
 
     // everything below is formatting the output
     // first we create a results obj with keys labeled 0 to 100
